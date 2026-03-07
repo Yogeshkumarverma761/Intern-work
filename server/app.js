@@ -13,8 +13,26 @@ import chatbotRoutes from './routes/chatbot.route.js'
 dotenv.config();
 const app = express();
 connectToDB();
+
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://smart-stitch-chi.vercel.app')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
+app.set('trust proxy', 1);
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://smart-stitch-chi.vercel.app/', 'http://localhost:3000'],
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(express.json());

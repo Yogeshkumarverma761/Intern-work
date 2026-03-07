@@ -40,7 +40,7 @@ export const AI_CONFIG = {
 
   // API Endpoints
   API: {
-    BASE_URL: "http://localhost:5000",
+    BASE_URL: import.meta.env.VITE_BASE_URL || "http://localhost:5000",
     SAVE_MEASUREMENTS: "/api/measurements",
     GET_MEASUREMENTS: "/api/measurements",
     UPDATE_MEASUREMENT: "/api/measurements/:id",

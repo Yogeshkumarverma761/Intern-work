@@ -17,6 +17,8 @@ import {
 import Measurements from "../components/Measurement/Measurement.jsx";
 import Header from "../components/Header.jsx";
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
+
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [measurements, setMeasurements] = useState(null);
@@ -27,7 +29,7 @@ export default function Profile() {
   useEffect(() => {
     // Fetch user profile
     axios
-      .get("http://localhost:5000/users/profile", {
+      .get(`${API_BASE_URL}/users/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data.user))
@@ -35,7 +37,7 @@ export default function Profile() {
 
     // Fetch measurements
     axios
-      .get("http://localhost:5000/measurements/", {
+      .get(`${API_BASE_URL}/measurements/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -298,7 +300,7 @@ export default function Profile() {
                         setShowMeasurementForm(false);
                         // Re-fetch to get proper data types
                         axios
-                          .get("http://localhost:5000/measurements/", {
+                          .get(`${API_BASE_URL}/measurements/`, {
                             headers: { Authorization: `Bearer ${token}` },
                           })
                           .then((res) => {
@@ -353,7 +355,7 @@ export default function Profile() {
                         setShowMeasurementForm(false);
                         // Re-fetch to get proper data
                         axios
-                          .get("http://localhost:5000/measurements/", {
+                          .get(`${API_BASE_URL}/measurements/`, {
                             headers: { Authorization: `Bearer ${token}` },
                           })
                           .then((res) => {

@@ -6,6 +6,8 @@ import { UserDataContext } from '../context/UserContext.jsx';
 import Header from '../components/Header.jsx';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
+
 const formatInr = (amount) =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -105,7 +107,7 @@ export default function Checkout() {
       };
 
       const response = await axios.post(
-        'http://localhost:5000/orders/create-cart-order',
+        `${API_BASE_URL}/orders/create-cart-order`,
         orderData,
         {
           headers: {

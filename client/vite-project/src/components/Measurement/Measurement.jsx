@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Ruler, Save, CheckCircle, AlertCircle } from "lucide-react";
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
+
 export default function Measurements({ userId, onMeasurementsSaved }) {
   const [measurements, setMeasurements] = useState({
     height: "",
@@ -31,7 +33,7 @@ export default function Measurements({ userId, onMeasurementsSaved }) {
       return;
     }
     axios
-      .get("http://localhost:5000/measurements/", {
+      .get(`${API_BASE_URL}/measurements/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -84,14 +86,14 @@ export default function Measurements({ userId, onMeasurementsSaved }) {
       if (existingId) {
         // Update existing
         await axios.patch(
-          `http://localhost:5000/measurements/${existingId}`,
+          `${API_BASE_URL}/measurements/${existingId}`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         // Create new
         const res = await axios.post(
-          "http://localhost:5000/measurements/",
+          `${API_BASE_URL}/measurements/`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );

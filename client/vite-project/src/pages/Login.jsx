@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { Mail, Lock, ChevronRight } from "lucide-react";
 import { UserDataContext } from '../context/UserContext.jsx';
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const { setUser } = React.useContext(UserDataContext);
@@ -25,7 +27,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const endpoint = "http://localhost:5000/users/login";
+      const endpoint = `${API_BASE_URL}/users/login`;
 
       const payload = {
         email: form.email,

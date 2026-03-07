@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Edit2, Save, Sparkles, AlertCircle } from "lucide-react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
+
 export default function MeasurementReview({ 
   initialMeasurements, 
   isAIGenerated = false, 
@@ -42,7 +44,7 @@ export default function MeasurementReview({
         confidence: measurements.confidence || null,
       };
 
-      await axios.post("http://localhost:5000/measurements/", measurementData, {
+      await axios.post(`${API_BASE_URL}/measurements/`, measurementData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

@@ -5,6 +5,8 @@ import { Mail, User, Phone, Lock, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { UserDataContext } from "../context/UserContext.jsx";
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
+
 export default function Signup() {
   const navigate = useNavigate();
   const { setUser } = React.useContext(UserDataContext);
@@ -31,7 +33,7 @@ export default function Signup() {
       phoneNo: form.phoneNo,
     };
 
-    const res = await axios.post("http://localhost:5000/users/register", payload);
+    const res = await axios.post(`${API_BASE_URL}/users/register`, payload);
 
     if (res.status === 201) {
       setUser(res.data.user);

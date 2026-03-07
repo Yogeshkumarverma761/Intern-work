@@ -3,6 +3,8 @@ import { ShoppingBag, Package, Users, DollarSign, Clock, CheckCircle, XCircle, E
 import Header from '../components/Header.jsx';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
+
 const formatInr = (amount) =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -63,7 +65,7 @@ export default function AdminDashboard() {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get('http://localhost:5000/orders/all');
+      const response = await axios.get(`${API_BASE_URL}/orders/all`);
       
       if (response.data.success) {
         const ordersData = response.data.data;

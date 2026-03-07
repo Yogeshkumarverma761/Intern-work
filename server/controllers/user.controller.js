@@ -52,7 +52,14 @@ const loginUser = async(req, res, next)=>{
     }
 
     const token = user.generateAuthToken();
-    res.cookie('token', token);
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+    };
+
+    res.cookie('token', token, cookieOptions);
     res.status(200).json({ token, user})
 }
 
@@ -61,7 +68,12 @@ const getUserProfile = async(req, res, next)=>{
 }   
 
 const logoutUser = async(req, res, next)=>{
-    res.clearCookie("token");
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+    });
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
     await blacklistTokenModel.create({ token });
     res.status(200).json({ message: "Logged out successfully" });
