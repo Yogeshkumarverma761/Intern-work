@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 connectToDB();
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+  origin: ['http://localhost:5173', 'https://smart-stitch-chi.vercel.app/', 'http://localhost:3000'],
   credentials: true
 }));
 app.use(express.json());
@@ -31,6 +31,6 @@ app.use('/users', userRoutes);
 app.use('/orders', orderRoutes);
 app.use('/cloths', clothRoutes);
 app.use('/measurements', measurementRoutes);
-app.use('/api/chatbot', chatbotRoutes);
+app.use('/chatbot', chatbotRoutes);
 
 export default app;
