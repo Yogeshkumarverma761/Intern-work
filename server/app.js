@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import orderRoutes from './routes/order.route.js';
 import measurementRoutes from './routes/measurement.route.js'
 import clothRoutes from './routes/cloth.route.js'
+import chatbotRoutes from './routes/chatbot.route.js'
 
 dotenv.config();
 const app = express();
@@ -30,5 +31,6 @@ app.use('/users', userRoutes);
 app.use('/orders', orderRoutes);
 app.use('/cloths', clothRoutes);
 app.use('/measurements', measurementRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 export default app;

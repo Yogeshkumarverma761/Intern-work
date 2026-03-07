@@ -42,7 +42,7 @@ export default function MeasurementReview({
         confidence: measurements.confidence || null,
       };
 
-      await axios.post("http://localhost:5000/api/measurements", measurementData, {
+      await axios.post("http://localhost:5000/measurements/", measurementData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -135,15 +135,13 @@ export default function MeasurementReview({
       </div>
 
       {/* Action Buttons */}
-      {isEditing && (
-        <button
-          onClick={handleSave}
-          className="w-full bg-rose-600 text-white py-3 rounded-xl shadow-md hover:bg-rose-700 transition-all font-medium flex items-center justify-center gap-2"
-        >
-          <Save className="w-5 h-5" />
-          Save Measurements
-        </button>
-      )}
+      <button
+        onClick={handleSave}
+        className="w-full bg-rose-600 text-white py-3 rounded-xl shadow-md hover:bg-rose-700 transition-all font-medium flex items-center justify-center gap-2"
+      >
+        <Save className="w-5 h-5" />
+        Save to Profile
+      </button>
 
       {saved && (
         <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl text-center">

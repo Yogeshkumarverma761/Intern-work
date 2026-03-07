@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import UserContext from "./context/UserContext.jsx";
 import CartProvider from "./context/CartContext.jsx";
 import UserProtectedWrapper from "./pages/UserProtectedWrapper.jsx";
+import ChatBot from "./components/ChatBot/ChatBot.jsx";
 
 export default function App() {
   return (
@@ -55,6 +56,7 @@ export default function App() {
           />
 
         </Routes>
+        <ChatBot />
       </CartProvider>
     </UserContext>
   );

@@ -116,7 +116,9 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
     return Math.sqrt(dx * dx + dy * dy);
   };
 
-  // Calculate measurements from pose keypoints
+  // Calculate measurements from pose keypoints using height-dominant anthropometric approach
+  // The skeleton is used only to determine a body-build ratio for minor personalization,
+  // not for direct cm conversions (which are unreliable from 2D camera data).
   const calculateMeasurements = (keypoints, heightInCm) => {
     // Extract key body points
     const nose = keypoints.find((kp) => kp.name === "nose");
@@ -134,62 +136,83 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
     // Check if all required points are detected with good confidence
     const requiredPoints = [
       nose, leftShoulder, rightShoulder, leftHip, rightHip,
-      leftElbow, rightElbow, leftWrist, rightWrist
+      leftElbow, rightElbow, leftWrist, rightWrist,
+      leftAnkle, rightAnkle
     ];
     
     const avgConfidence = requiredPoints.reduce((sum, pt) => sum + (pt?.score || 0), 0) / requiredPoints.length;
     
-    if (avgConfidence < 0.3) {
+    if (avgConfidence < 0.4) {
       return null; // Not enough confidence
     }
 
-    // Calculate pixel-to-cm ratio based on user-provided height
-    const headToAnkle = calculateDistance(
-      nose,
-      { x: (leftAnkle.x + rightAnkle.x) / 2, y: (leftAnkle.y + rightAnkle.y) / 2 }
-    );
-    const pixelToCm = heightInCm / headToAnkle;
+    // --- Build factor from skeleton proportions ---
+    // Instead of converting pixel widths to cm (unreliable due to camera distance/angle),
+    // we compute the RATIO of shoulder width to full body height in pixels.
+    // This ratio is camera-distance-independent and tells us if the person is
+    // broader or narrower than average.
+    const ankleCenter = {
+      x: (leftAnkle.x + rightAnkle.x) / 2,
+      y: (leftAnkle.y + rightAnkle.y) / 2
+    };
+    const noseToAnkle = calculateDistance(nose, ankleCenter);
+    const shoulderWidthPx = calculateDistance(leftShoulder, rightShoulder);
+    const hipWidthPx = calculateDistance(leftHip, rightHip);
 
-    // Calculate measurements
-    const shoulderWidth = calculateDistance(leftShoulder, rightShoulder) * pixelToCm;
-    const hipWidth = calculateDistance(leftHip, rightHip) * pixelToCm;
+    // Expected shoulder-to-height ratio for an average adult: ~0.25-0.26
+    const expectedShoulderRatio = 0.255;
+    const detectedShoulderRatio = shoulderWidthPx / noseToAnkle;
     
-    // Arm length (shoulder to wrist)
-    const leftArmLength = (
-      calculateDistance(leftShoulder, leftElbow) + 
-      calculateDistance(leftElbow, leftWrist)
-    ) * pixelToCm;
-    
-    const rightArmLength = (
-      calculateDistance(rightShoulder, rightElbow) + 
-      calculateDistance(rightElbow, rightWrist)
-    ) * pixelToCm;
-    
-    const avgArmLength = (leftArmLength + rightArmLength) / 2;
+    // Build factor: how much broader/narrower than average (clamped to ±15%)
+    const rawBuildFactor = detectedShoulderRatio / expectedShoulderRatio;
+    const buildFactor = Math.max(0.85, Math.min(1.15, rawBuildFactor));
 
-    // Estimate body measurements using realistic body proportion ratios
-    // Using more conservative multipliers to account for 2D to 3D conversion
-    const chest = shoulderWidth * 2.2; // Chest circumference estimate (typically 85-110 cm)
-    const waist = hipWidth * 1.8; // Waist circumference estimate (typically 70-90 cm)
-    const hips = hipWidth * 2.3; // Hip circumference estimate (typically 90-110 cm)
-    const bust = chest * 0.92; // Bust estimate for female measurements
-    
-    // Neck estimate (proportional to shoulder width)
-    const neck = shoulderWidth * 0.85;
-    
-    // Sleeve length (actual arm length measurement is already accurate)
-    const sleeve = avgArmLength * 0.95;
+    // Hip build factor (for hip-specific adjustments)
+    const expectedHipRatio = 0.18;
+    const detectedHipRatio = hipWidthPx / noseToAnkle;
+    const rawHipFactor = detectedHipRatio / expectedHipRatio;
+    const hipBuildFactor = Math.max(0.85, Math.min(1.15, rawHipFactor));
+
+    // --- Height-based anthropometric measurements ---
+    // These ratios come from established anthropometric research and produce
+    // realistic values. The build factor provides ±15% personalization.
+
+    // Chest circumference: average ~54% of height
+    const chest = Math.round(heightInCm * 0.54 * buildFactor);
+
+    // Waist circumference: average ~45% of height
+    const waist = Math.round(heightInCm * 0.45 * buildFactor);
+
+    // Hip circumference: average ~54% of height (uses hip-specific build factor)
+    const hips = Math.round(heightInCm * 0.54 * hipBuildFactor);
+
+    // Bust: slightly less than chest (~96%)
+    const bust = Math.round(chest * 0.96);
+
+    // Shoulder width: average ~25.5% of height
+    const shoulder = Math.round(heightInCm * 0.255 * buildFactor);
+
+    // Neck circumference: average ~21.5% of height
+    const neck = Math.round(heightInCm * 0.215);
+
+    // Arm length: average ~34% of height
+    const armLength = Math.round(heightInCm * 0.34);
+
+    // Sleeve length: average ~33% of height
+    const sleeve = Math.round(heightInCm * 0.33);
+
+    console.log("Build factor:", buildFactor.toFixed(2), "| Hip factor:", hipBuildFactor.toFixed(2));
 
     return {
       height: Math.round(heightInCm),
-      bust: Math.round(bust),
-      chest: Math.round(chest),
-      waist: Math.round(waist),
-      hips: Math.round(hips),
-      shoulder: Math.round(shoulderWidth),
-      armLength: Math.round(avgArmLength),
-      neck: Math.round(neck),
-      sleeve: Math.round(sleeve),
+      bust,
+      chest,
+      waist,
+      hips,
+      shoulder,
+      armLength,
+      neck,
+      sleeve,
       confidence: Math.round(avgConfidence * 100),
     };
   };
