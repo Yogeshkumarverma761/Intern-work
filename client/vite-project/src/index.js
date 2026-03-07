@@ -1,4 +1,4 @@
-import SignUp from "./pages/Signup"
+import SignUp from "./pages/SignUp"
 import Home from "./pages/Home"
 import Login from "./pages/Login"
 import UserProfile from "./pages/UserProfile"
