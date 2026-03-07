@@ -83,6 +83,15 @@ export default function Checkout() {
 
     try {
       const token = localStorage.getItem('token');
+
+      // Handle dummy products locally (no server-side order creation needed)
+      const hasDummyItems = cartItems.some((item) => item.id?.startsWith('dummy-'));
+      if (hasDummyItems) {
+        clearCart();
+        alert('Payment confirmed! Your order has been placed successfully.');
+        navigate('/');
+        return;
+      }
       
       // Create order with cart items
       const orderData = {

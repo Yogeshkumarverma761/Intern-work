@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import {
   Heart,
   ShoppingBag,
@@ -12,12 +13,16 @@ import {
   Share2,
   Shirt,
   Instagram,
-  Info
+  Info,
+  Sparkles,
+  CheckCircle
 } from 'lucide-react';
 import { fetchClothById } from '../api/clothApi.js';
 import Header from '../components/Header.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { dummyProducts } from '../data/dummyProducts.js';
+
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -42,6 +47,41 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [savedMeasurements, setSavedMeasurements] = useState(null);
+  const [measurementsLoaded, setMeasurementsLoaded] = useState(false);
+
+  const token = localStorage.getItem('token');
+
+  // Fetch saved measurements on mount
+  useEffect(() => {
+    if (!token) return;
+    axios
+      .get(`${API_BASE_URL}/measurements/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const data = res.data?.data;
+        if (data && data.length > 0) {
+          setSavedMeasurements(data[0]);
+        }
+      })
+      .catch(() => {});
+  }, [token]);
+
+  // Load saved measurements into custom fields
+  const loadSavedMeasurements = () => {
+    if (!savedMeasurements) return;
+    setCustomMeasurements({
+      neck: savedMeasurements.neck || '',
+      chest: savedMeasurements.chest || '',
+      waist: savedMeasurements.waist || '',
+      hips: savedMeasurements.hips || '',
+      sleeve: savedMeasurements.sleeve || '',
+      inseam: savedMeasurements.inseam || '',
+    });
+    setMeasurementsLoaded(true);
+    setTimeout(() => setMeasurementsLoaded(false), 3000);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -447,16 +487,23 @@ export default function ProductDetail() {
 
               {/* MEASUREMENT SELECTION */}
               <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-white/40 shadow-lg">
-                <div className="flex items-center gap-2 mb-4">
-                  <Ruler className="w-5 h-5 text-rose-600" />
-                  <h3 className="text-lg font-bold text-stone-900">Select Size & Measurements</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Ruler className="w-5 h-5 text-rose-600" />
+                    <h3 className="text-lg font-bold text-stone-900">Select Size & Measurements</h3>
+                  </div>
+                  {savedMeasurements && (
+                    <span className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full font-medium">
+                      ✓ Saved measurements available
+                    </span>
+                  )}
                 </div>
 
-                {/* Measurement Type Toggle */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
+                {/* Measurement Type Toggle — 3 tabs */}
+                <div className="grid grid-cols-3 gap-2 mb-6">
                   <button
                     onClick={() => setMeasurementType('standard')}
-                    className={`px-4 py-3 rounded-xl font-medium transition ${
+                    className={`px-3 py-3 rounded-xl font-medium text-sm transition ${
                       measurementType === 'standard'
                         ? 'bg-rose-600 text-white'
                         : 'bg-white/70 text-stone-700 hover:bg-white'
@@ -465,8 +512,11 @@ export default function ProductDetail() {
                     Standard Sizes
                   </button>
                   <button
-                    onClick={() => setMeasurementType('custom')}
-                    className={`px-4 py-3 rounded-xl font-medium transition ${
+                    onClick={() => {
+                      setMeasurementType('custom');
+                      if (savedMeasurements && !customMeasurements.chest) loadSavedMeasurements();
+                    }}
+                    className={`px-3 py-3 rounded-xl font-medium text-sm transition ${
                       measurementType === 'custom'
                         ? 'bg-rose-600 text-white'
                         : 'bg-white/70 text-stone-700 hover:bg-white'
@@ -474,7 +524,22 @@ export default function ProductDetail() {
                   >
                     Custom Fit
                   </button>
+                  <button
+                    onClick={() => navigate('/ai-tryon')}
+                    className="px-3 py-3 rounded-xl font-medium text-sm transition flex items-center justify-center gap-1.5 bg-white/70 text-stone-700 hover:bg-white"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    AI Measure
+                  </button>
                 </div>
+
+                {/* Success banner when measurements loaded */}
+                {measurementsLoaded && (
+                  <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <span className="text-sm text-emerald-700 font-medium">Measurements loaded successfully!</span>
+                  </div>
+                )}
 
                 {/* STANDARD SIZES */}
                 {measurementType === 'standard' && (
@@ -553,10 +618,15 @@ export default function ProductDetail() {
                       ))}
                     </div>
 
-                    <button className="w-full py-2 text-sm text-rose-600 hover:text-rose-700 font-medium flex items-center justify-center gap-2">
-                      <User className="w-4 h-4" />
-                      Load Saved Measurements
-                    </button>
+                    {savedMeasurements && (
+                      <button
+                        onClick={loadSavedMeasurements}
+                        className="w-full py-2 text-sm text-rose-600 hover:text-rose-700 font-medium flex items-center justify-center gap-2"
+                      >
+                        <User className="w-4 h-4" />
+                        Load Saved Measurements
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
