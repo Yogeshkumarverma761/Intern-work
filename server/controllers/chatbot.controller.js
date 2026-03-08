@@ -435,7 +435,6 @@ export const handleChatbotMessage = async (req, res) => {
 
         suggestions = await getSuggestions('recommend');
       } catch (dbError) {
-        console.error('Database error:', dbError);
         responseText = `I'd love to show you products, but I'm having trouble reaching our catalog right now. Please try the Shop page directly!`;
         suggestions = ['About SmartStitch', 'Shipping info', 'AI Try-On help'];
       }
@@ -450,7 +449,6 @@ export const handleChatbotMessage = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Chatbot error:', error);
     res.status(500).json({
       message: 'Sorry, I encountered an error. Please try again later.',
       error: error.message
@@ -489,7 +487,6 @@ export const getSuggestedProducts = async (req, res) => {
     res.json({ products: products.map(formatProduct) });
 
   } catch (error) {
-    console.error('Suggested products error:', error);
     res.status(500).json({ message: 'Error fetching suggestions', error: error.message });
   }
 };

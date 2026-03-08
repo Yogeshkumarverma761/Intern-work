@@ -9,7 +9,6 @@ export const getChatbotResponse = async (userMessage) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Chatbot API error:', error);
     throw error;
   }
 };
@@ -19,7 +18,6 @@ export const getChatbotInfo = async (infoType) => {
     const response = await axios.get(`${API_BASE_URL}/chatbot/info/${infoType}`);
     return response.data;
   } catch (error) {
-    console.error('Chatbot info API error:', error);
     throw error;
   }
 };
@@ -31,7 +29,6 @@ export const getSuggestedProducts = async (searchQuery) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Suggested products API error:', error);
     throw error;
   }
 };

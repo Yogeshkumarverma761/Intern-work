@@ -156,7 +156,6 @@ const getShopMeta = async (req, res) => {
 const createCloth = async (req, res) => {
   try {
     // Admin check is already done in authAdmin middleware
-    console.log("Admin User:", req.user);
 
     const {
       title,
@@ -217,13 +216,11 @@ const createCloth = async (req, res) => {
       colors: parseList(colors),
       designs: parseList(designs),
     });
-    console.log("Cloth Created:", cloth);
 
     res.status(201).json({ success: true, data: cloth });
   } 
   catch (err) {
     res.status(500).json({ message: err.message });
-    console.log("Create Cloth Error:", err);
   }
 };
 

@@ -15,21 +15,13 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
   const [userHeight, setUserHeight] = useState("");
   const animationFrameId = useRef(null);
 
-  // Track state changes
-  useEffect(() => {
-    console.log("State updated - Status:", status, "Measurements:", measurements ? "exists" : "null", "Confidence:", confidence);
-  }, [status, measurements, confidence]);
-
   // Initialize pose detector
   useEffect(() => {
     const initDetector = async () => {
       try {
         setStatus("loading");
-        console.log("Initializing TensorFlow.js...");
         await tf.ready();
-        console.log("TensorFlow.js ready");
         
-        console.log("Loading MoveNet model...");
         const detectorConfig = {
           modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
         };
@@ -39,11 +31,9 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
           detectorConfig
         );
         
-        console.log("MoveNet model loaded successfully");
         setDetector(poseDetector);
         setStatus("ready");
       } catch (err) {
-        console.error("Model initialization error:", err);
         setError("Failed to load AI model: " + err.message);
         setStatus("idle");
       }
@@ -81,16 +71,13 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
           videoRef.current.play();
           setIsCapturing(true);
           setStatus("capturing");
-          console.log("Camera started successfully");
         };
         
         videoRef.current.onerror = (err) => {
-          console.error("Video error:", err);
           setError("Failed to play video stream");
         };
       }
     } catch (err) {
-      console.error("Camera error:", err);
       setError("Failed to access camera: " + err.message);
     }
   };
@@ -201,8 +188,6 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
     // Sleeve length: average ~33% of height
     const sleeve = Math.round(heightInCm * 0.33);
 
-    console.log("Build factor:", buildFactor.toFixed(2), "| Hip factor:", hipBuildFactor.toFixed(2));
-
     return {
       height: Math.round(heightInCm),
       bust,
@@ -294,13 +279,10 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
         return;
       }
 
-      console.log("Starting pose estimation...");
       const poses = await detector.estimatePoses(videoRef.current, {
         maxPoses: 1,
         flipHorizontal: false,
       });
-      
-      console.log("Poses detected:", poses.length);
       
       if (poses.length > 0) {
         drawPose(poses);
@@ -308,20 +290,16 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
         const heightInCm = parseFloat(userHeight);
         const measuredData = calculateMeasurements(poses[0].keypoints, heightInCm);
         
-        console.log("Measured data:", measuredData);
-        
         if (measuredData) {
           // Stop camera first
           stopCamera();
           
           // Then update measurements state
-          console.log("Setting measurements state...");
           setMeasurements(measuredData);
           setConfidence(measuredData.confidence);
           
           // Finally, update status to trigger UI change
           setTimeout(() => {
-            console.log("Setting status to complete...");
             setStatus("complete");
           }, 100);
         } else {
@@ -333,7 +311,6 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
         setStatus("capturing");
       }
     } catch (err) {
-      console.error("Capture error:", err);
       setError("Analysis failed: " + err.message);
       setStatus("capturing");
     }
@@ -358,7 +335,7 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
           setConfidence(Math.round(avgConfidence * 100));
         }
       } catch (err) {
-        console.error("Pose detection error:", err);
+        // Pose detection error
       }
 
       animationFrameId.current = requestAnimationFrame(detectPoseContinuously);
@@ -376,12 +353,8 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
   }, [isCapturing, status, detector]);
 
   const handleComplete = () => {
-    console.log("handleComplete called with measurements:", measurements);
     if (onMeasurementsComplete && measurements) {
-      console.log("Calling onMeasurementsComplete callback");
       onMeasurementsComplete(measurements);
-    } else {
-      console.warn("Cannot call onMeasurementsComplete - callback exists:", !!onMeasurementsComplete, "measurements exist:", !!measurements);
     }
   };
 
@@ -526,7 +499,6 @@ export default function AIMeasurement({ onMeasurementsComplete }) {
           <div className="flex gap-3">
             <button
               onClick={() => {
-                console.log("Retake button clicked");
                 setStatus("ready");
                 setMeasurements(null);
                 setConfidence(0);

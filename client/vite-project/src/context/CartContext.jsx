@@ -28,7 +28,6 @@ const CartProvider = ({ children }) => {
           : [];
         setCartItems(normalized);
       } catch (error) {
-        console.error('Error parsing stored cart:', error);
         localStorage.removeItem('cart');
       }
     }

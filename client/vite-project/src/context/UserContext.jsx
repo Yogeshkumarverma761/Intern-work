@@ -12,7 +12,7 @@ const UserContext = ({ children }) => {
       try {
         setUser(JSON.parse(storedUser));
       } catch (error) {
-        console.error('Error parsing stored user:', error);
+        // Error parsing stored user
       }
     }
   }, []);

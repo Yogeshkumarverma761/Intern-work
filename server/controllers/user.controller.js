@@ -24,7 +24,6 @@ const registerUser = async(req, res, next)=>{
         password: hashPassword,
         phoneNo
     })
-    console.log(user);
     
     const token = user.generateAuthToken();
 

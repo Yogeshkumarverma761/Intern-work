@@ -51,7 +51,6 @@ export default function Signup() {
       await registerUser();
       setLoading(false);
     } catch (err) {
-      console.log(err);
       alert(err.response?.data?.message || "Signup failed.");
       setLoading(false);
     }

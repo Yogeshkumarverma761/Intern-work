@@ -27,7 +27,6 @@ export const createCloth = async (payload, token) => {
     headers: isFormData ? headers : headers,
     withCredentials: true,
   });
-  console.log("Create Cloth Response:", data);
   return data;
 };
 

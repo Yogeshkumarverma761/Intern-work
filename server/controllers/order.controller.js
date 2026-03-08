@@ -111,7 +111,6 @@ const deleteOrder = async (req, res) => {
 // New: Create cart-based order
   const createCartOrder = async (req, res) => {
   try {
-    console.log("Request body:", req.body);
     const { items, lat, lng, subtotal, gst, total, paymentMethod, paidAmount, remainingAmount } = req.body;
     const userId = req.user._id;
 

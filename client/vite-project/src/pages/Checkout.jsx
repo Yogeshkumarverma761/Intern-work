@@ -56,7 +56,6 @@ export default function Checkout() {
   };
 
   const handleConfirmOrder = async () => {
-    console.log("user:", user);
     if (!user) {
       setError('Please login to place an order');
       setTimeout(() => navigate('/login'), 2000);

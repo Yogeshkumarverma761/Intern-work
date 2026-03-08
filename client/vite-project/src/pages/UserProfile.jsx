@@ -33,7 +33,9 @@ export default function Profile() {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data.user))
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        // Error fetching user profile
+      });
 
     // Fetch measurements
     axios

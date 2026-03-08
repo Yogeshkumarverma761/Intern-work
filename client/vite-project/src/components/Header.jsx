@@ -19,7 +19,6 @@ export default function Header() {
     try {
       return JSON.parse(cached);
     } catch (error) {
-      console.error("Failed to parse cached user", error);
       return null;
     }
   }, [user]);
