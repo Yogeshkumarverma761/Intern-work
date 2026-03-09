@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 connectToDB();
 
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://smart-stitch-chi.vercel.app')
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://smart-stitch-chi.vercel.app, https://www.smartstitch.shop, https://smartstitch.shop')
   .split(',')
   .map((origin) => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
