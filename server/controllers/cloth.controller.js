@@ -112,7 +112,7 @@ const getClothById = async (req, res) => {
       return res.status(404).json({ message: "Cloth not found" });
 
     res.json({ success: true, data: cloth });
-  } 
+  }
   catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -192,9 +192,8 @@ const createCloth = async (req, res) => {
       return [];
     };
 
-    const host = `${req.protocol}://${req.get("host")}`;
     const uploadedImages = Array.isArray(req.files)
-      ? req.files.map((file) => `${host}/uploads/${file.filename}`)
+      ? req.files.map((file) => file.path)
       : [];
 
     if (!title || !price || !category) {
@@ -218,7 +217,7 @@ const createCloth = async (req, res) => {
     });
 
     res.status(201).json({ success: true, data: cloth });
-  } 
+  }
   catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -237,7 +236,7 @@ const updateCloth = async (req, res) => {
       return res.status(404).json({ message: "Cloth not found" });
 
     res.json({ success: true, data: cloth });
-  } 
+  }
   catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -252,18 +251,18 @@ const deleteCloth = async (req, res) => {
       return res.status(404).json({ message: "Cloth not found" });
 
     res.json({ success: true, message: "Cloth deleted successfully" });
-  } 
+  }
   catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
 
-export default { 
-    getAllClothes,
-    getClothById,
-    createCloth,
-    updateCloth,
+export default {
+  getAllClothes,
+  getClothById,
+  createCloth,
+  updateCloth,
   deleteCloth,
   getShopMeta
- };
+};
